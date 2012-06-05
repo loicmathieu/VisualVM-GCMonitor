@@ -1,0 +1,4 @@
+VisualVM-GCMonitor is an initiative to build a monitoring plugin for JVisualVM for Garbage Collection.
+It is based on two different plugin : 
+VisualVM-GCMonitor6 : a plugin for Java 6 and 7 prior to update 4 JVMs based on last GC info
+VisualVM-GCMonitor7 : a plugin for Java 7 starting from update 4 JVMs based on Jms Notification info (more accurate)
