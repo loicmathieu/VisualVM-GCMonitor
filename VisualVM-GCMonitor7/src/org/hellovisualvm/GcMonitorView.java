@@ -31,15 +31,18 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import java.awt.Point;
+import java.lang.management.GarbageCollectorMXBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.management.MBeanServerConnection;
+import javax.management.NotificationEmitter;
 import javax.management.ObjectName;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+import org.hellovisualvm.gcnotif.GarbageCollectorNotificationListener;
 import org.openide.util.Utilities;
 
 public class GcMonitorView extends DataSourceView {
@@ -62,15 +65,7 @@ public class GcMonitorView extends DataSourceView {
         super(Application,"GC Monitor", new ImageIcon(Utilities.loadImage(IMAGE_PATH, true)).getImage(), 60, false);
     }
 
-    protected DataViewComponent createComponent() {
-        //TODO
-//         List<GarbageCollectorMXBean> gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
-//    //Install a notifcation handler for each bean
-//        for (GarbageCollectorMXBean gcbean : gcbeans) {
-//        System.out.println(gcbean);
-//        NotificationEmitter emitter = (NotificationEmitter) gcbean;
-//        emitter.addNotificationListener(listener, null, null);
-      
+    protected DataViewComponent createComponent() {      
         //Data area for master view:
         JEditorPane generalDataArea = new JEditorPane();
         generalDataArea.setBorder(BorderFactory.createEmptyBorder(7, 8, 7, 8));
@@ -85,14 +80,22 @@ public class GcMonitorView extends DataSourceView {
         dvc.addDetailsView(new DataViewComponent.DetailsView( "Summary", "Summary", DataViewComponent.TOP_LEFT, summaryPanel, null), DataViewComponent.TOP_LEFT);
         
         // the magic that gets a handle on all instances of GarbageCollectorMXBean
-        findGcMonitors();
-        for ( GarbageCollectorModel model : models) {
-            GcMonitorPanel panel = new GcMonitorPanel(model.getName());
-            Point position = calculatePosition(model.getName());
-            dvc.addDetailsView(new DataViewComponent.DetailsView(  model.getName(), "gc charts", position.y, panel, null), position.x);
-            model.registerListener(panel);
-            model.registerListener(summaryPanel);
-            model.init();
+//        findGcMonitors();
+//        for ( GarbageCollectorModel model : models) {
+//            GcMonitorPanel panel = new GcMonitorPanel(model.getName());
+//            Point position = calculatePosition(model.getName());
+//            dvc.addDetailsView(new DataViewComponent.DetailsView(  model.getName(), "gc charts", position.y, panel, null), position.x);
+//            model.registerListener(panel);
+//            model.registerListener(summaryPanel);
+//            model.init();
+//        }
+        
+         List<GarbageCollectorMXBean> gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
+        //Install a notifcation handler for each bean
+        for (GarbageCollectorMXBean gcbean : gcbeans) {
+            System.out.println(gcbean);
+            NotificationEmitter emitter = (NotificationEmitter) gcbean;
+            emitter.addNotificationListener(new GarbageCollectorNotificationListener(), null, null);
         }
         return dvc;
     }
